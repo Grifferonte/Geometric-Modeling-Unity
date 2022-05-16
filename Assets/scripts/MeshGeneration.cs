@@ -15,7 +15,7 @@ public class MeshGeneration : MonoBehaviour
     private void Awake()
     {
         if (!m_Mf) m_Mf = GetComponent<MeshFilter>();
-        m_QuadMesh = CreateShip();
+        m_QuadMesh = CreateCube();
         m_Mf.mesh = m_QuadMesh;
         Debug.Log(ExportMeshToCSV(m_QuadMesh));
     }
