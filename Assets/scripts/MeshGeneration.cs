@@ -15,9 +15,15 @@ public class MeshGeneration : MonoBehaviour
     private void Awake()
     {
         if (!m_Mf) m_Mf = GetComponent<MeshFilter>();
-        m_QuadMesh = CreateCube();
-        m_Mf.mesh = m_QuadMesh;
-        Debug.Log(ExportMeshToCSV(m_QuadMesh));
+        //m_QuadMesh = CreateCube();
+        //m_Mf.mesh = m_QuadMesh;
+        HalfEdgeManager HEM = new HalfEdgeManager(CreateCube());
+        
+        CSVWriter writer = new CSVWriter("cubeHE");
+        //writer.WriteCSVHE(HEM.dicoHE);
+        m_Mf.mesh = HEM.output();
+        m_Mf.mesh.RecalculateNormals();
+
     }
 
     Mesh CreateQuad()
