@@ -16,17 +16,26 @@ public class CSVWriter
 public void WriteCSVMesh(Vector3[] vertex ,int[] quads)
 {
     TextWriter tw = new StreamWriter(filename, false);
-    tw.WriteLine("Vertex;Quads");
+    tw.WriteLine("Vertex;");
     tw.Close();
 
     tw = new StreamWriter(filename, true);
 
     for(int i =0;i<vertex.Length;i++)
     {
-        tw.WriteLine(vertex[i].ToString()+";"+quads[i].ToString());
+        tw.WriteLine(vertex[i].ToString()+";");
+    }
+    tw.WriteLine("Quads;");
+    for(int i =0;i<quads.Length;i+=6)
+    {
+        tw.WriteLine("("+quads[i].ToString()+","+quads[i+1].ToString()+","+quads[i+2].ToString()+","+quads[i+5].ToString()+");");
     }
     tw.Close();
 
+    foreach(int child in quads)
+    {
+        Debug.LogWarning(child);
+    }
     Debug.LogWarning("Path = "+filename);
 }
 
@@ -47,6 +56,48 @@ public void WriteCSVHE(Dictionary<int, HE> toWrite)
     Debug.LogWarning("Path = "+filename);
 }
 
+public void WriteCSWE(Dictionary<int, WE> toWrite, List<WE_Face>lFace, Vector3[] vertex)
+{
+    TextWriter tw = new StreamWriter(filename, false);
+    tw.WriteLine(("startVertex;endVertex;faceLeft;faceRight;keyPrevLE;keyNextLE;keyPrevRE;keyNextRE"));
+    tw.Close();
+
+    tw = new StreamWriter(filename, true);
+
+    for (int i=0;i<toWrite.Count;i++)
+    {
+        tw.WriteLine(convertVertex( toWrite[i].startVertex.pos,vertex).ToString()+";"+
+        convertVertex( toWrite[i].endVertex.pos,vertex).ToString()+";"+
+        toWrite[i].faceLeft.ToString()+";"+
+        toWrite[i].faceRight.ToString()+";"+
+        toWrite[i].keyPrevLE.ToString()+";"+
+        toWrite[i].keyNextLE.ToString()+";"+
+        toWrite[i].keyPrevRE.ToString()+";"+
+        toWrite[i].keyNextRE.ToString()+";")
+        ;
+    }
+    tw.WriteLine((";"));
+    tw.WriteLine(("FaceIndex;EdgeList"));
+    foreach(WE_Face face in lFace)
+    {
+        tw.WriteLine((face.id+";("+face.associatedEdges[0]+","+face.associatedEdges[1]+","+face.associatedEdges[2]+","+face.associatedEdges[3]+")"));
+    }
+   
+
+    tw.Close();
+
+    Debug.LogWarning("Path = "+filename);
+}
+
+public int convertVertex(Vector3 pV,Vector3[] vertex )
+{
+    for(int i=0;i<vertex.Length;i++)
+    {
+        if(vertex[i]==pV)return i;
+    }
+    return -1;
+}
+
 public Mesh ReadCSVHE()
 {
     Mesh mesh = new Mesh();
@@ -59,8 +110,6 @@ public Mesh ReadCSVHE()
 
     using(var reader = new StreamReader(filename))
     {
-        
-        
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();

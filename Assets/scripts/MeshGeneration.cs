@@ -15,14 +15,16 @@ public class MeshGeneration : MonoBehaviour
     private void Awake()
     {
         if (!m_Mf) m_Mf = GetComponent<MeshFilter>();
-        //m_QuadMesh = CreateCube();
-        //m_Mf.mesh = m_QuadMesh;
-        HalfEdgeManager HEM = new HalfEdgeManager(CreateCube());
+        m_QuadMesh = CreateCube();
+        m_Mf.mesh = m_QuadMesh;
+        //HalfEdgeManager HEM = new HalfEdgeManager(CreateCube());
+        WingedEdgeManager WEM = new WingedEdgeManager(CreateCube());
         
-        CSVWriter writer = new CSVWriter("cubeHE");
-        //writer.WriteCSVHE(HEM.dicoHE);
-        m_Mf.mesh = HEM.output();
-        m_Mf.mesh.RecalculateNormals();
+        CSVWriter writer = new CSVWriter("cubeWE");
+        //writer.WriteCSVMesh(m_Mf.mesh.vertices,m_Mf.mesh.triangles);
+        writer.WriteCSWE(WEM.dicoWE,WEM.listFWE,m_Mf.mesh.vertices);
+        //m_Mf.mesh = HEM.output();
+        //m_Mf.mesh.RecalculateNormals();
 
     }
 
