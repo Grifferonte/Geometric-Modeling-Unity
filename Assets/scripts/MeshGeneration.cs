@@ -18,9 +18,35 @@ public class MeshGeneration : MonoBehaviour
     private void Awake()
     {
         if (!m_Mf) m_Mf = GetComponent<MeshFilter>();
-        m_QuadMesh = CreateRelugarPolygone();
-        m_Mf.mesh = m_QuadMesh;
-        Debug.Log(ExportMeshToCSV(m_QuadMesh));
+        //m_QuadMesh = CreateCube();
+        //m_Mf.mesh = m_QuadMesh;
+        
+
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        sphere.transform.position = new Vector3(0, 2.0f, 0);
+        sphere.SetActive(false);
+
+        HalfEdgeManager HEM = new HalfEdgeManager(sphere.GetComponent<MeshFilter>().mesh);
+        //WingedEdgeManager WEM = new WingedEdgeManager(sphere.GetComponent<MeshFilter>().mesh);
+        HEM.subdivide();
+        HEM.subdivide();
+        HEM.subdivide();
+
+        HEM.subdivide();
+        //HEM.subdivide();
+        m_Mf.mesh=HEM.output();
+        //HEM.subdivide();
+        //HEM.subdivide();
+        m_QuadMesh=HEM.output();
+        
+        
+        CSVWriter writer = new CSVWriter("planeWEUNity");
+        //writer.WriteCSVMesh(m_Mf.mesh.vertices,m_Mf.mesh.triangles);
+        //writer.WriteCSWE(WEM.dicoWE,WEM.listFWE,m_Mf.mesh.vertices);
+        //writer.WriteCSWE(WEM.dicoWE,WEM.listFWE,sphere.GetComponent<MeshFilter>().mesh.vertices);
+        //m_Mf.mesh = HEM.output();
+        //m_Mf.mesh.RecalculateNormals();
+
     }
 
     Mesh CreateQuad()
@@ -280,6 +306,7 @@ public class MeshGeneration : MonoBehaviour
 
             Handles.Label(centroidPos, new GUIContent(str), guiStyle);
         }
+
     }
 
     string ExportMeshToCSV(Mesh mesh)
