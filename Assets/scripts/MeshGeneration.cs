@@ -9,6 +9,9 @@ public class MeshGeneration : MonoBehaviour
     [SerializeField] Vector3 gridSize;
     [SerializeField] Vector3 gridOffset;
     [SerializeField] Vector3 cellSize;
+    [SerializeField] int numberVertices;
+
+    [SerializeField] float radius;
 
     Mesh m_QuadMesh;
 
@@ -131,11 +134,6 @@ public class MeshGeneration : MonoBehaviour
         vertices[6] = new Vector3(halfSize.x, halfSize.y, halfSize.z) + gridOffset;
         vertices[7] = new Vector3(+halfSize.x, halfSize.y, -halfSize.z) + gridOffset;
 
-        foreach (Vector3 item in vertices)
-        {
-            Debug.Log(item);
-        }
-
         //BOTTOM
         quads[0] = 0;
         quads[1] = 1;
@@ -197,11 +195,6 @@ public class MeshGeneration : MonoBehaviour
         vertices[6] = new Vector3(halfSize.x, halfSize.y, halfSize.z) + gridOffset;
         vertices[7] = new Vector3(+halfSize.x, halfSize.y, -halfSize.z) + gridOffset;
 
-        foreach (Vector3 item in vertices)
-        {
-            Debug.Log(item);
-        }
-
         //BOTTOM
         quads[0] = 0;
         quads[1] = 1;
@@ -226,7 +219,57 @@ public class MeshGeneration : MonoBehaviour
         return mesh;
     }
 
-    /*private void OnDrawGizmos()
+    Mesh CreateRelugarPolygone() {
+        Mesh mesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[(numberVertices * 2 + 1)];
+        int[] regularPolygone = new int[(numberVertices * 4)];
+
+        float angle = 2 * Mathf.PI / numberVertices;
+
+        vertices[0] = gridOffset;
+
+        int h = 1; 
+        for (int i = 0; i < numberVertices; i++)
+        {
+            if (h == numberVertices * 2 - 1) {
+                vertices[h+1] = Vector3.Lerp(vertices[h], vertices[1], 0.5f) + gridOffset;
+            }
+            else {
+                if (h == 1) {
+                    vertices[h] = new Vector3(Mathf.Sin(i * angle), 0, Mathf.Cos(i*angle))*radius + gridOffset;
+                }
+                vertices[h+2] = new Vector3(Mathf.Sin((i+1) * angle), 0, Mathf.Cos((i+1)*angle))*radius + gridOffset;
+                vertices[h+1] = Vector3.Lerp(vertices[h], vertices[h+2], 0.5f) + gridOffset;
+            }
+            h+=2;
+        }          
+
+        int k = 0;
+        for (int i = 0; i < (numberVertices * 4); i+=4)
+        {
+            if (i == 0) {
+                regularPolygone[0] = k;
+                regularPolygone[i] = (numberVertices * 2);
+                regularPolygone[i+1] = k+1;
+                regularPolygone[i+2] = k+2;
+            }
+            else {
+                regularPolygone[i] = 0;
+                regularPolygone[i+1] = k;
+                regularPolygone[i+2] = k+1;
+                regularPolygone[i+3] = k+2;
+            }
+            k+=2;
+        }
+
+        mesh.vertices = vertices;
+        mesh.SetIndices(regularPolygone, MeshTopology.Quads, 0);
+
+        return mesh;
+    }
+
+    private void OnDrawGizmos()
     {
         if (!m_QuadMesh) return;
 
@@ -264,7 +307,7 @@ public class MeshGeneration : MonoBehaviour
             Handles.Label(centroidPos, new GUIContent(str), guiStyle);
         }
 
-    }*/
+    }
 
     string ExportMeshToCSV(Mesh mesh)
     {
