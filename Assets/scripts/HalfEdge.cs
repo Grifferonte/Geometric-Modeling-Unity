@@ -64,6 +64,31 @@ public class HalfEdgeManager
         {
             for (int j = 0; j < dicoHE.Count; j++)
             {
+                if (dicoHE[i].originVertex.pos == dicoHE[j].originVertex.pos && next(dicoHE[i]).originVertex.pos == next(dicoHE[j]).originVertex.pos && i!=j)
+                {
+                    var e1 = dicoHE[i];
+                    var e2 = next(e1);
+                    var e3 = next(e2);
+                    var e4 = next(e3);
+                    
+                    HE[] toSwap={e1,e2,e2,e4};
+
+                    for(int q=0;q<4;q++)
+                    {
+                        HE toedit = dicoHE[q];
+                        toedit.keyNextEdge = dicoHE[q].keyPrevEdge;
+                        toedit.keyPrevEdge = dicoHE[q].keyNextEdge;
+                        dicoHE[i+q] = toedit;
+                    }
+                    
+                }
+            }
+        }
+
+        for (int i = 0; i < dicoHE.Count; i++)
+        {
+            for (int j = 0; j < dicoHE.Count; j++)
+            {
                 if (dicoHE[i].originVertex.pos == next(dicoHE[j]).originVertex.pos && next(dicoHE[i]).originVertex.pos == dicoHE[j].originVertex.pos)
                 {
                     HE toedit = dicoHE[i];
@@ -96,10 +121,10 @@ public class HalfEdgeManager
             quads.Add(index);
         }
 
-        for (int i = 0; i < verts.Count; i++) { Debug.LogWarning(verts[i]); }
-        for (int i = 0; i < quads.Count; i++) { Debug.LogWarning(quads[i]); }
-        Debug.LogWarning("vertex count:" + verts.Count);
-        Debug.LogWarning("quads count:" + quads.Count);
+        //for (int i = 0; i < verts.Count; i++) { Debug.LogWarning(verts[i]); }
+        //for (int i = 0; i < quads.Count; i++) { Debug.LogWarning(quads[i]); }
+        //Debug.LogWarning("vertex count:" + verts.Count);
+        //Debug.LogWarning("quads count:" + quads.Count);
 
         mesh.vertices = verts.ToArray();
         mesh.SetIndices(quads.ToArray(), MeshTopology.Quads, 0);
@@ -230,6 +255,8 @@ public class HalfEdgeManager
         List<Vector3> prevPos = new List<Vector3>();
         List<Vector3> nextPos = new List<Vector3>();
 
+        
+        
         foreach (Vector3 v in midPointList)
         {
             for (int i = 0; i < dicoHE.Count; i++)
@@ -245,6 +272,7 @@ public class HalfEdgeManager
                     var e4=next(next(next(twin(e3))));
                     var v4 = e4.originVertex.pos; 
                     prevPos.Add(v);
+                    Debug.LogWarning(v1+":"+v2+":"+v3+":"+v4);
                     nextPos.Add((v1+v2+v3+v4)/4);   
                 }
             }
@@ -283,11 +311,6 @@ public class HalfEdgeManager
                 }
             }
         }
-
-
-
-
-
     }
 
 }
