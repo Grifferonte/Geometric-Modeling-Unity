@@ -34,21 +34,25 @@ public class HalfEdgeManager
             HEV4.keyIncidentEdge = edgeCount + 3;
 
             HE1.originVertex = HEV1;
+            HE1.keyTwinEdge=-1;
             HE1.keyNextEdge = edgeCount + 1;
             HE1.keyPrevEdge = edgeCount + 3;
             HE1.incidentFace = HEF;
 
             HE2.originVertex = HEV2;
+            HE2.keyTwinEdge=-1;
             HE2.keyNextEdge = edgeCount + 2;
             HE2.keyPrevEdge = edgeCount;
             HE2.incidentFace = HEF;
 
             HE3.originVertex = HEV3;
+            HE3.keyTwinEdge=-1;
             HE3.keyNextEdge = edgeCount + 3;
             HE3.keyPrevEdge = edgeCount + 1;
             HE3.incidentFace = HEF;
 
             HE4.originVertex = HEV4;
+            HE4.keyTwinEdge=-1;
             HE4.keyNextEdge = edgeCount;
             HE4.keyPrevEdge = edgeCount + 2;
             HE4.incidentFace = HEF;
@@ -62,6 +66,32 @@ public class HalfEdgeManager
 
         for (int i = 0; i < dicoHE.Count; i++)
         {
+            for (int j = 0; j < dicoHE.Count; j++)
+            {
+                if (dicoHE[i].originVertex.pos == dicoHE[j].originVertex.pos && next(dicoHE[i]).originVertex.pos == next(dicoHE[j]).originVertex.pos && i!=j)
+                {
+                    var e1 = dicoHE[i];
+                    var e2 = next(e1);
+                    var e3 = next(e2);
+                    var e4 = next(e3);
+                    
+                    HE[] toSwap={e1,e2,e2,e4};
+
+                    for(int q=0;q<4;q++)
+                    {
+                        HE toedit = dicoHE[q];
+                        toedit.keyNextEdge = dicoHE[q].keyPrevEdge;
+                        toedit.keyPrevEdge = dicoHE[q].keyNextEdge;
+                        dicoHE[i+q] = toedit;
+                    }
+                    
+                }
+            }
+        }
+
+        for (int i = 0; i < dicoHE.Count; i++)
+        {
+            
             for (int j = 0; j < dicoHE.Count; j++)
             {
                 if (dicoHE[i].originVertex.pos == next(dicoHE[j]).originVertex.pos && next(dicoHE[i]).originVertex.pos == dicoHE[j].originVertex.pos)
@@ -96,10 +126,10 @@ public class HalfEdgeManager
             quads.Add(index);
         }
 
-        for (int i = 0; i < verts.Count; i++) { Debug.LogWarning(verts[i]); }
-        for (int i = 0; i < quads.Count; i++) { Debug.LogWarning(quads[i]); }
-        Debug.LogWarning("vertex count:" + verts.Count);
-        Debug.LogWarning("quads count:" + quads.Count);
+        //for (int i = 0; i < verts.Count; i++) { Debug.LogWarning(verts[i]); }
+        //for (int i = 0; i < quads.Count; i++) { Debug.LogWarning(quads[i]); }
+        //Debug.LogWarning("vertex count:" + verts.Count);
+        //Debug.LogWarning("quads count:" + quads.Count);
 
         mesh.vertices = verts.ToArray();
         mesh.SetIndices(quads.ToArray(), MeshTopology.Quads, 0);
@@ -221,55 +251,84 @@ public class HalfEdgeManager
             }
         }
 
-        for (int i = 0; i < dicoHE.Count; i++)
-        {
-            if (!cornersList.Contains(dicoHE[i].originVertex.pos) && !midPointList.Contains(dicoHE[i].originVertex.pos)) edgePointList.Add(dicoHE[i].originVertex.pos);
-
-        }
-
         List<Vector3> prevPos = new List<Vector3>();
         List<Vector3> nextPos = new List<Vector3>();
 
-        foreach (Vector3 v in midPointList)
+        for (int i = 0; i < dicoHE.Count; i++)
         {
-            for (int i = 0; i < dicoHE.Count; i++)
+
+            var e1 = next(dicoHE[i]);
+            var e2 = prev(dicoHE[i]);
+
+            List<Vector3> l = new List<Vector3>();
+            List<Vector3> opposite = new List<Vector3>();
+
+            for (int j = 0; j < dicoHE.Count; j++)
             {
-                if (dicoHE[i].originVertex.pos == v && !prevPos.Contains(v))
+                if(prevPos.Contains(dicoHE[i].originVertex.pos))break;
+                
+                if (dicoHE[j].originVertex.pos==dicoHE[i].originVertex.pos && i!=j)
                 {
-                    var e1=next(dicoHE[i]);
-                    var v1 = e1.originVertex.pos;
-                    var e2=next(next(e1));
-                    var v2 = e2.originVertex.pos;
-                    var e3=next(next(next(twin(e2))));
-                    var v3 = e3.originVertex.pos;    
-                    var e4=next(next(next(twin(e3))));
-                    var v4 = e4.originVertex.pos; 
-                    prevPos.Add(v);
-                    nextPos.Add((v1+v2+v3+v4)/4);   
+                    if(!l.Contains(dicoHE[j].originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) l.Add(dicoHE[j].originVertex.pos);
+                    if(!opposite.Contains(next(dicoHE[j]).originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) opposite.Add(next(dicoHE[j]).originVertex.pos);
+                }
+
+                if (dicoHE[dicoHE[j].keyNextEdge].originVertex.pos==dicoHE[i].originVertex.pos && i!=j )
+                {
+                    if(!l.Contains(dicoHE[j].originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) l.Add(dicoHE[j].originVertex.pos);
+                    if(!opposite.Contains(next(dicoHE[j]).originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) opposite.Add(next(dicoHE[j]).originVertex.pos);
+                }
+
+                if (dicoHE[dicoHE[j].keyPrevEdge].originVertex.pos==dicoHE[i].originVertex.pos && i!=j)
+                {
+                    if(!l.Contains(dicoHE[j].originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) l.Add(dicoHE[j].originVertex.pos);
+                    if(!opposite.Contains(next(dicoHE[j]).originVertex.pos) && dicoHE[i].originVertex.pos!=dicoHE[j].originVertex.pos) opposite.Add(next(dicoHE[j]).originVertex.pos);
                 }
             }
-        }
+        
 
-        foreach (Vector3 v in cornersList )
-        {
-            for (int i = 0; i < dicoHE.Count; i++)
+            if(l.Count==2)
             {
-                if (dicoHE[i].originVertex.pos == v && !prevPos.Contains(v))
-                {
-                    var e1=next(dicoHE[i]);
-                    var v1 = e1.originVertex.pos;
-                    var e2=next(next(e1));
-                    var v2 = e2.originVertex.pos;
+                prevPos.Add(dicoHE[i].originVertex.pos);
+                nextPos.Add((l[0]+l[1])/2);
+            }
 
-                    var e3 = next(next(next((twin(e2)))));
-                    var v3 = e3.originVertex.pos;    
-                    prevPos.Add(v);
-                    nextPos.Add((v1+v2+v3)/3);   
+            if(l.Count==3)
+            {
+                Debug.LogWarning(dicoHE[i].originVertex.pos);
+                Debug.LogWarning(l.Count);
+                
+                Debug.LogWarning(l[0]+":"+l[1]+":"+l[2]);
+
+                bool border=false;
+
+                for(int q=0;q<dicoHE.Count;q++)
+                {
+                    if(dicoHE[q].originVertex.pos==dicoHE[i].originVertex.pos)
+                    {
+                        if(dicoHE[q].keyTwinEdge==-1)border=true;
+                    }
                 }
+
+                if(border)
+                {
+                    prevPos.Add(dicoHE[i].originVertex.pos);
+                    nextPos.Add((l[0]+l[1]+l[2]+dicoHE[i].originVertex.pos)/4);
+                }
+                else
+                {
+                    prevPos.Add(dicoHE[i].originVertex.pos);
+                    nextPos.Add((opposite[0]+opposite[1]+opposite[2])/3);
+                }
+                
+            }
+
+            if(l.Count==4)
+            {
+                prevPos.Add(dicoHE[i].originVertex.pos);
+                nextPos.Add((l[0]+l[1]+l[2]+l[3])/4);
             }
         }
-
-
 
         for (int i = 0; i < prevPos.Count; i++)
         {
@@ -283,11 +342,6 @@ public class HalfEdgeManager
                 }
             }
         }
-
-
-
-
-
     }
 
 }
