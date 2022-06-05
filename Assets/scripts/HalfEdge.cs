@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -125,12 +124,6 @@ public class HalfEdgeManager
             int index = verts.IndexOf(dicoHE[i].originVertex.pos);
             quads.Add(index);
         }
-
-        //for (int i = 0; i < verts.Count; i++) { Debug.LogWarning(verts[i]); }
-        //for (int i = 0; i < quads.Count; i++) { Debug.LogWarning(quads[i]); }
-        //Debug.LogWarning("vertex count:" + verts.Count);
-        //Debug.LogWarning("quads count:" + quads.Count);
-
         mesh.vertices = verts.ToArray();
         mesh.SetIndices(quads.ToArray(), MeshTopology.Quads, 0);
 
@@ -295,11 +288,6 @@ public class HalfEdgeManager
 
             if(l.Count==3)
             {
-                Debug.LogWarning(dicoHE[i].originVertex.pos);
-                Debug.LogWarning(l.Count);
-                
-                Debug.LogWarning(l[0]+":"+l[1]+":"+l[2]);
-
                 bool border=false;
 
                 for(int q=0;q<dicoHE.Count;q++)
