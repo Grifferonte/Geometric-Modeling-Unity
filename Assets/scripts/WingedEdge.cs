@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public class WingedEdgeManager
 {
@@ -147,11 +145,6 @@ public class WingedEdgeManager
             List<Vector3> prevVertex = new List<Vector3>();
             List<Vector3> lv = new List<Vector3>();
 
-            int flow = 0;
-
-            WE next;
-            WE opposite;
-
             var edge=dicoWE[face.associatedEdges[0]];
 
             var edgenext=dicoWE[face.associatedEdges[3]];
@@ -212,11 +205,6 @@ public class WingedEdgeManager
             }
 
         }
-
-        foreach (Vector3 vc in verts) { Debug.LogWarning(vc); }
-        foreach (int q in quads) { Debug.LogWarning(q); }
-        Debug.LogWarning("vertex count:" + verts.Count);
-        Debug.LogWarning("quads count:" + quads.Count);
 
         mesh.SetVertices(verts);
         mesh.SetIndices(quads, MeshTopology.Quads, 0);
@@ -294,7 +282,6 @@ public class WE
 
     public int checkOrder(Vector3[] lV)
     {
-        //Debug.LogWarning(v1+":"+v2);
         //0 meme sens 1 contresens
         int p1 = -1;
         int p2 = -1;
@@ -304,7 +291,6 @@ public class WE
             if (lV[i] == startVertex.pos) p1 = i;
             if (lV[i] == endVertex.pos) p2 = i;
         }
-        //Debug.LogWarning(p2>p1?1:2);
         return (p2 > p1) ? 0 : 1;
     }
 }
