@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+//Classe pour gerer nos HalfEdge et nos dictionnaires
 public class HalfEdgeManager
 {
     public Dictionary<int, HE> dicoHE;
@@ -107,6 +107,7 @@ public class HalfEdgeManager
     public HE prev(HE currentEdge) { return dicoHE[currentEdge.keyPrevEdge]; }
     public HE twin(HE currentEdge) { return dicoHE[currentEdge.keyTwinEdge]; }
 
+    //Envoie le mesh correspondant a notre WingedEdge
     public Mesh output()
     {
         Mesh mesh = new Mesh();
@@ -132,23 +133,11 @@ public class HalfEdgeManager
         return mesh;
     }
 
+    //Methode pour le subdivide et le catmull
     public void subdivide()
     {
         List<int> exclude = new List<int>();
         Dictionary<int, HE> subDicoHE = new Dictionary<int, HE>();
-
-        List<Vector3> midPointList = new List<Vector3>();
-
-        List<Vector3> cornersList = new List<Vector3>();
-
-        List<Vector3> edgePointList = new List<Vector3>();
-
-        for (int i = 0; i < dicoHE.Count; i++)
-        {
-            if (!cornersList.Contains(dicoHE[i].originVertex.pos)) cornersList.Add(dicoHE[i].originVertex.pos);
-
-        }
-
 
         int idcount = 0;
         for (int i = 0; i < dicoHE.Count; i++)
@@ -165,10 +154,6 @@ public class HalfEdgeManager
                 Vector3 mid2 = (e2.originVertex.pos + e3.originVertex.pos) / 2;
                 Vector3 mid3 = (e3.originVertex.pos + e4.originVertex.pos) / 2;
                 Vector3 mid4 = (e4.originVertex.pos + e1.originVertex.pos) / 2;
-                midPointList.Add(mid1);
-                midPointList.Add(mid2);
-                midPointList.Add(mid3);
-                midPointList.Add(mid4);
 
                 List<Vector3> l1 = new List<Vector3> { mid4, e1.originVertex.pos, mid1, centerVert };
                 List<Vector3> l2 = new List<Vector3> { mid1, e2.originVertex.pos, mid2, centerVert };

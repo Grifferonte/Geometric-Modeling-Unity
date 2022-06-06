@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Classe pour gerer nos WingedEdge et nos dictionnaires
 public class WingedEdgeManager
 {
     public Dictionary<int, WE> dicoWE;
@@ -16,9 +17,9 @@ public class WingedEdgeManager
         int edgeCount = 0;
         int id = 0;
 
-        for (int i = 0; i < lT.Length; i += 6) //lT.Length
+        //On convertit notre Face Vertex en Winged Edge avec des check selon les sens d enregistrement des vertex
+        for (int i = 0; i < lT.Length; i += 6) 
         {
-            //creation vertex
             WE_vertex WEV1, WEV2, WEV3, WEV4;
 
             WEV1.pos = lV[lT[i]];
@@ -60,8 +61,6 @@ public class WingedEdgeManager
                 o[j] = t[j] != -1 ? t[j] : o[j];
             }
 
-            //selon sens ordre vertex !!
-
             WE_vertex[] vClock = { WEV1, WEV2, WEV3, WEV4 };
 
             int[] vOffPrev = { 3, -1, -1, -1 };
@@ -92,7 +91,7 @@ public class WingedEdgeManager
                 if (j == 2) { v1 = vClock[2]; v2 = vClock[3]; p = 1; n = 3; }
                 if (j == 3) { v1 = vClock[3]; v2 = vClock[0]; p = 2; n = 0; }
 
-                if (order == 1 && cd == 1) { var s = v1; v1 = v2; v2 = s; }//vertex working
+                if (order == 1 && cd == 1) { var s = v1; v1 = v2; v2 = s; }
 
                 var vPrev = t[p] != -1 ? t[p] : o[p];
                 var vNext = t[n] != -1 ? t[n] : o[n];
@@ -102,7 +101,7 @@ public class WingedEdgeManager
                     WE cWe = new WE();
                     if (direction[j] == 1)
                     {
-                        if (cd == 2 || cd - 1 != order) { var s = vPrev; vPrev = vNext; vNext = s; }//vertex working
+                        if (cd == 2 || cd - 1 != order) { var s = vPrev; vPrev = vNext; vNext = s; }
                         cWe.setLeft(v1, v2, WEF.id, vPrev, vNext);
                     }
                     else cWe.setRight(v1, v2, WEF.id, vPrev, vNext);
@@ -112,7 +111,7 @@ public class WingedEdgeManager
                 {
                     if (direction[j] == 1)
                     {
-                        if (cd == 2 || cd - 1 != order) { var s = vPrev; vPrev = vNext; vNext = s; }//vertex working
+                        if (cd == 2 || cd - 1 != order) { var s = vPrev; vPrev = vNext; vNext = s; }
                         dicoWE[t[j]].setLeft(v1, v2, WEF.id, vPrev, vNext);
 
                     }
@@ -129,6 +128,7 @@ public class WingedEdgeManager
 
     }
 
+    //Envoie le mesh correspondant a notre WingedEdge
     public Mesh output()
     {
         Mesh mesh = new Mesh();
@@ -215,22 +215,18 @@ public class WingedEdgeManager
     }
 }
 
-
-//la solution ajouter un troisièmt efor, regarde le prev e tle next et si ils ont des edges les ajouter
-//c'est un peu sale il faudrait condenser tout ça mais nique
-
-
+//classe WingedEdge contenant des methodes pour checker les directions et etats
 public class WE
 {
 
     public WE_vertex startVertex;
     public WE_vertex endVertex;
 
-    public int faceLeft; //first one
-    public int faceRight; //second one
+    public int faceLeft; 
+    public int faceRight;
 
-    public int keyPrevLE; //first
-    public int keyNextLE; //second
+    public int keyPrevLE; 
+    public int keyNextLE; 
     public int keyPrevRE;
     public int keyNextRE;
 
@@ -258,7 +254,6 @@ public class WE
         return false;
     }
 
-    //-1 base, 0 rempli, 1 gauche restant, 2 droite restant
     public int checkState()
     {
         if (keyPrevLE == 0 && keyNextLE == 0)
@@ -282,7 +277,6 @@ public class WE
 
     public int checkOrder(Vector3[] lV)
     {
-        //0 meme sens 1 contresens
         int p1 = -1;
         int p2 = -1;
 

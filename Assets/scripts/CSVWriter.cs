@@ -3,6 +3,8 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 
+
+//classe pour enregistrer nos CSV
 public class CSVWriter
 {
     public string filename ="";
@@ -38,6 +40,7 @@ public class CSVWriter
         Debug.LogWarning("Path = "+filename);
     }
 
+    //Methode enregistrement CSV Half Edge
     public void WriteCSVHE(Dictionary<int, HE> toWrite)
     {
         TextWriter tw = new StreamWriter(filename, false);
@@ -55,6 +58,7 @@ public class CSVWriter
         Debug.LogWarning("Path = "+filename);
     }
 
+    //Methode enregistrement CSV Winged Edge
     public void WriteCSWE(Dictionary<int, WE> toWrite, List<WE_Face>lFace, Vector3[] vertex)
     {
         TextWriter tw = new StreamWriter(filename, false);
@@ -97,6 +101,7 @@ public class CSVWriter
         return -1;
     }
 
+    //Methode enregistrement CSV Half Edge
     public Mesh ReadCSVHE()
     {
         Mesh mesh = new Mesh();
